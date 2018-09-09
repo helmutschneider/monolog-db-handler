@@ -10,6 +10,8 @@ declare(strict_types = 1);
 namespace HelmutSchneider\Monolog;
 
 use DateTimeInterface;
+use Monolog\Formatter\LineFormatter;
+use Monolog\Formatter\NormalizerFormatter;
 use PDO;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
@@ -22,9 +24,13 @@ class DatabaseHandler extends AbstractProcessingHandler
 {
 
     protected const INSERT_QUERY = <<<SQL
-        INSERT INTO `%s`(`channel`, `level`, `datetime`, `message`)
-             VALUES (:channel, :level, :datetime, :message)
+        INSERT INTO `%s`(`channel`, `level`, `datetime`, `message`, `context`, `extra`)
+             VALUES (:channel, :level, :datetime, :message, :context, :extra)
 SQL;
+
+    protected const JSON_ENCODE_FLAGS =
+        JSON_UNESCAPED_SLASHES |
+        JSON_UNESCAPED_UNICODE;
 
     /**
      * @var PDO
@@ -52,6 +58,7 @@ SQL;
     {
         $this->db = $db;
         $this->tableName = $tableName;
+        $this->setFormatter(new LineFormatter('%message%'));
 
         parent::__construct($level, $bubble);
     }
@@ -83,6 +90,8 @@ SQL;
             ':level' => $record['level'],
             ':datetime' => $dt->format('Y-m-d H:i:s'),
             ':message' => $record['formatted'],
+            ':context' => json_encode($record['context'], static::JSON_ENCODE_FLAGS),
+            ':extra' => json_encode($record['extra'], static::JSON_ENCODE_FLAGS),
         ]);
 
         $this->isHandling = false;

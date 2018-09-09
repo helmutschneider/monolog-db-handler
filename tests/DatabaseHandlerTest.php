@@ -45,7 +45,9 @@ class DatabaseHandlerTest extends TestCase
             new DatabaseHandler($db, 'log'),
         ]);
 
-        $logger->log(Logger::DEBUG, 'Hello World');
+        $logger->log(Logger::DEBUG, 'Hello World', [
+            'some_var' => 1,
+        ]);
 
         $stmt = $db->prepare('SELECT * FROM log');
         $stmt->execute();
@@ -54,7 +56,8 @@ class DatabaseHandlerTest extends TestCase
         $this->assertCount(1, $rows);
         $this->assertEquals('test', $rows[0]['channel']);
         $this->assertEquals(Logger::DEBUG, $rows[0]['level']);
-        $this->assertContains('Hello World', $rows[0]['message']);
+        $this->assertEquals('Hello World', $rows[0]['message']);
+        $this->assertEquals('{"some_var":1}', $rows[0]['context']);
     }
 
 }

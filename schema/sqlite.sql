@@ -4,5 +4,7 @@ CREATE TABLE "log" (
     "channel" TEXT NOT NULL,
     "level" INTEGER NOT NULL,
     "datetime" TEXT NOT NULL,
-    "message" BLOB NOT NULL
+    "message" BLOB NOT NULL,
+    "context" LONGBLOB NOT NULL,
+    "extra" LONGBLOB NOT NULL
 );

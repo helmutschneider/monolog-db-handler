@@ -11,6 +11,7 @@
     "minimum-stability": "stable",
     "require": {
         "php": ">=7.1",
+        "ext-json": "*",
         "ext-pdo": "*",
         "monolog/monolog": "~1.0"
     },

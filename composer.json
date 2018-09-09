@@ -1,0 +1,33 @@
+{
+    "name": "helmutschneider/monolog-db-handler",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Johan Björk",
+            "email": "johanimon@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=7.1",
+        "ext-pdo": "*",
+        "monolog/monolog": "~1.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "HelmutSchneider\\Monolog\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "HelmutSchneider\\Tests\\Monolog\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

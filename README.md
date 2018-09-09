@@ -2,6 +2,9 @@
 Simple handler to write Monolog entries to a PDO-database.
 
 ## Usage
+Database schemas for MySQL and SQLite can be found in `schema/`.
+When your database is ready you can inject the handler into your logger.
+
 ```php
 use PDO;
 use Monolog\Logger;

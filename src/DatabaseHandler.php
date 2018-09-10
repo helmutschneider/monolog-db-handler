@@ -9,9 +9,8 @@ declare(strict_types = 1);
 
 namespace HelmutSchneider\Monolog;
 
-use DateTimeInterface;
-use Monolog\Formatter\NormalizerFormatter;
 use PDO;
+use Monolog\Formatter\NormalizerFormatter;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
 

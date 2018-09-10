@@ -10,7 +10,6 @@ declare(strict_types = 1);
 namespace HelmutSchneider\Monolog;
 
 use DateTimeInterface;
-use Monolog\Formatter\LineFormatter;
 use Monolog\Formatter\NormalizerFormatter;
 use PDO;
 use Monolog\Handler\AbstractProcessingHandler;
@@ -58,7 +57,6 @@ SQL;
     {
         $this->db = $db;
         $this->tableName = $tableName;
-        $this->setFormatter(new LineFormatter('%message%'));
 
         parent::__construct($level, $bubble);
     }
@@ -80,21 +78,26 @@ SQL;
 
         $this->isHandling = true;
 
-        /* @var DateTimeInterface $dt */
-        $dt = $record['datetime'];
-
         $query = sprintf(static::INSERT_QUERY, $this->tableName);
         $stmt = $this->db->prepare($query);
         $stmt->execute([
-            ':channel' => $record['channel'],
-            ':level' => $record['level'],
-            ':datetime' => $dt->format('Y-m-d H:i:s'),
-            ':message' => $record['formatted'],
-            ':context' => json_encode($record['context'], static::JSON_ENCODE_FLAGS),
-            ':extra' => json_encode($record['extra'], static::JSON_ENCODE_FLAGS),
+            ':channel' => $record['formatted']['channel'],
+            ':level' => $record['formatted']['level'],
+            ':datetime' => $record['formatted']['datetime'],
+            ':message' => $record['formatted']['message'],
+            ':context' => json_encode($record['formatted']['context'], static::JSON_ENCODE_FLAGS),
+            ':extra' => json_encode($record['formatted']['extra'], static::JSON_ENCODE_FLAGS),
         ]);
 
         $this->isHandling = false;
+    }
+
+    /**
+     * @return \Monolog\Formatter\FormatterInterface|NormalizerFormatter
+     */
+    public function getFormatter()
+    {
+        return new NormalizerFormatter();
     }
 
 }

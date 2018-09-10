@@ -18,21 +18,40 @@ class DatabaseHandlerTest extends TestCase
 {
 
     /**
+     * @var PDO[]
+     */
+    public static $dbs = [];
+
+    public function setUp()
+    {
+        parent::setUp();
+
+        foreach (static::$dbs as $db) {
+            $db->exec('DELETE FROM log');
+        }
+    }
+
+    /**
      * @return array
      */
-    public function databaseProvider(): array
+    public static function databaseProvider(): array
     {
-        $configs = require __DIR__ . '/config.php';
+        if (empty(static::$dbs)) {
+            $configs = require __DIR__ . '/config.php';
+            static::$dbs = array_map(function ($config) {
+                $db = new PDO($config['dsn'], $config['username'], $config['password'], [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_EMULATE_PREPARES => false,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                ]);
+                $db->exec(file_get_contents($config['schema']));
+                return $db;
+            }, $configs);
+        }
 
-        return array_map(function ($config) {
-            $db = new PDO($config['dsn'], $config['username'], $config['password'], [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_EMULATE_PREPARES => false,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            ]);
-            $db->exec(file_get_contents($config['schema']));
+        return array_map(function (PDO $db) {
             return [$db];
-        }, $configs);
+        }, static::$dbs);
     }
 
     /**
@@ -58,6 +77,28 @@ class DatabaseHandlerTest extends TestCase
         $this->assertEquals(Logger::DEBUG, $rows[0]['level']);
         $this->assertEquals('Hello World', $rows[0]['message']);
         $this->assertEquals('{"some_var":1}', $rows[0]['context']);
+    }
+
+    /**
+     * @dataProvider databaseProvider
+     * @param PDO $db
+     */
+    public function testSerializesComplexObjects(PDO $db)
+    {
+        $logger = new Logger('test', [
+            new DatabaseHandler($db, 'log'),
+        ]);
+
+        $logger->log(Logger::DEBUG, 'Complex data', [
+            'handle' => STDIN,
+        ]);
+
+        $stmt = $db->prepare('SELECT * FROM log');
+        $stmt->execute();
+        $rows = $stmt->fetchAll();
+
+        $this->assertCount(1, $rows);
+        $this->assertContains('"handle":', $rows[0]['context']);
     }
 
 }

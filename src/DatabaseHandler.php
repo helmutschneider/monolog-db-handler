@@ -49,10 +49,10 @@ SQL;
      * DatabaseHandler constructor.
      * @param PDO $db
      * @param string $tableName
-     * @param int $level
+     * @param int|string $level
      * @param bool $bubble
      */
-    function __construct(PDO $db, string $tableName = 'log', int $level = Logger::DEBUG, bool $bubble = true)
+    function __construct(PDO $db, string $tableName = 'log', $level = Logger::DEBUG, bool $bubble = true)
     {
         $this->db = $db;
         $this->tableName = $tableName;

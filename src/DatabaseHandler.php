@@ -31,7 +31,12 @@ SQL;
         JSON_UNESCAPED_UNICODE;
 
     /**
-     * @var PDO
+     * @var PDOResolver
+     */
+    protected $resolver;
+
+    /**
+     * @var PDO|null
      */
     protected $db;
 
@@ -47,14 +52,14 @@ SQL;
 
     /**
      * DatabaseHandler constructor.
-     * @param PDO $db
+     * @param PDOResolver $resolver
      * @param string $tableName
      * @param int|string $level
      * @param bool $bubble
      */
-    function __construct(PDO $db, string $tableName = 'log', $level = Logger::DEBUG, bool $bubble = true)
+    function __construct(PDOResolver $resolver, string $tableName = 'log', $level = Logger::DEBUG, bool $bubble = true)
     {
-        $this->db = $db;
+        $this->resolver = $resolver;
         $this->tableName = $tableName;
 
         parent::__construct($level, $bubble);
@@ -76,6 +81,10 @@ SQL;
         }
 
         $this->isHandling = true;
+
+        if (!$this->db) {
+            $this->db = $this->resolver->getPDO();
+        }
 
         $query = sprintf(static::INSERT_QUERY, $this->tableName);
         $stmt = $this->db->prepare($query);

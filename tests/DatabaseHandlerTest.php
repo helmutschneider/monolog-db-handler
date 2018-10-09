@@ -9,7 +9,9 @@ declare(strict_types = 1);
 
 namespace HelmutSchneider\Tests\Monolog;
 
+use HelmutSchneider\Monolog\CallableResolver;
 use HelmutSchneider\Monolog\DatabaseHandler;
+use HelmutSchneider\Monolog\PDOResolver;
 use PDO;
 use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
@@ -50,25 +52,29 @@ class DatabaseHandlerTest extends TestCase
         }
 
         return array_map(function (PDO $db) {
-            return [$db];
+            return [
+                new CallableResolver(function () use ($db) {
+                    return $db;
+                }),
+            ];
         }, static::$dbs);
     }
 
     /**
      * @dataProvider databaseProvider
-     * @param PDO $db
+     * @param PDOResolver $resolver
      */
-    public function testWritesToDatabase(PDO $db)
+    public function testWritesToDatabase(PDOResolver $resolver)
     {
         $logger = new Logger('test', [
-            new DatabaseHandler($db, 'log'),
+            new DatabaseHandler($resolver, 'log'),
         ]);
 
         $logger->log(Logger::DEBUG, 'Hello World', [
             'some_var' => 1,
         ]);
 
-        $stmt = $db->prepare('SELECT * FROM log');
+        $stmt = $resolver->getPDO()->prepare('SELECT * FROM log');
         $stmt->execute();
         $rows = $stmt->fetchAll();
 
@@ -81,19 +87,19 @@ class DatabaseHandlerTest extends TestCase
 
     /**
      * @dataProvider databaseProvider
-     * @param PDO $db
+     * @param PDOResolver $resolver
      */
-    public function testSerializesComplexObjects(PDO $db)
+    public function testSerializesComplexObjects(PDOResolver $resolver)
     {
         $logger = new Logger('test', [
-            new DatabaseHandler($db, 'log'),
+            new DatabaseHandler($resolver, 'log'),
         ]);
 
         $logger->log(Logger::DEBUG, 'Complex data', [
             'handle' => STDIN,
         ]);
 
-        $stmt = $db->prepare('SELECT * FROM log');
+        $stmt = $resolver->getPDO()->prepare('SELECT * FROM log');
         $stmt->execute();
         $rows = $stmt->fetchAll();
 

@@ -31,12 +31,7 @@ SQL;
         JSON_UNESCAPED_UNICODE;
 
     /**
-     * @var PDOResolver
-     */
-    protected $resolver;
-
-    /**
-     * @var PDO|null
+     * @var DatabaseInterface
      */
     protected $db;
 
@@ -52,14 +47,14 @@ SQL;
 
     /**
      * DatabaseHandler constructor.
-     * @param PDOResolver $resolver
+     * @param DatabaseInterface $db
      * @param string $tableName
      * @param int|string $level
      * @param bool $bubble
      */
-    function __construct(PDOResolver $resolver, string $tableName = 'log', $level = Logger::DEBUG, bool $bubble = true)
+    function __construct(DatabaseInterface $db, string $tableName = 'log', $level = Logger::DEBUG, bool $bubble = true)
     {
-        $this->resolver = $resolver;
+        $this->db = $db;
         $this->tableName = $tableName;
 
         parent::__construct($level, $bubble);
@@ -82,13 +77,8 @@ SQL;
 
         $this->isHandling = true;
 
-        if (!$this->db) {
-            $this->db = $this->resolver->getPDO();
-        }
-
         $query = sprintf(static::INSERT_QUERY, $this->tableName);
-        $stmt = $this->db->prepare($query);
-        $stmt->execute([
+        $this->db->execute($query, [
             ':channel' => $record['formatted']['channel'],
             ':level' => $record['formatted']['level'],
             ':datetime' => $record['formatted']['datetime'],

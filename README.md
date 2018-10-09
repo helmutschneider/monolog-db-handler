@@ -9,11 +9,15 @@ When your database is ready you can inject the handler into your logger.
 use PDO;
 use Monolog\Logger;
 use HelmutSchneider\Monolog\DatabaseHandler;
+use HelmutSchneider\Monolog\CallableResolver;
 
 $db = new PDO(...);
+$resolver = new CallableResolver(function () use ($db) {
+    return $db;
+});
 $logger = new Logger('channel', [
     // second parameter is an optional table name. defaults to "log"
-    new DatabaseHandler($db, 'log'),
+    new DatabaseHandler($resolver, 'log'),
 ]);
 
 $logger->log(Logger::DEBUG, 'Hello World');

@@ -9,8 +9,6 @@ declare(strict_types = 1);
 
 namespace HelmutSchneider\Monolog;
 
-use PDO;
-use Monolog\Formatter\NormalizerFormatter;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
 
@@ -91,11 +89,11 @@ SQL;
     }
 
     /**
-     * @return \Monolog\Formatter\FormatterInterface|NormalizerFormatter
+     * @return \Monolog\Formatter\FormatterInterface
      */
     public function getFormatter()
     {
-        return new NormalizerFormatter();
+        return new DetailedNormalizeFormatter();
     }
 
 }

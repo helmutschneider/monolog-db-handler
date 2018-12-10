@@ -9,18 +9,18 @@ declare(strict_types = 1);
 
 namespace HelmutSchneider\Tests\Monolog;
 
-use HelmutSchneider\Monolog\DetailedNormalizeFormatter;
+use HelmutSchneider\Monolog\DetailedNormalizerFormatter;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Class DetailedNormalizeFormatterTest
  * @package HelmutSchneider\Tests\Monolog
  */
-class DetailedNormalizeFormatterTest extends TestCase
+class DetailedNormalizerFormatterTest extends TestCase
 {
 
     /**
-     * @var DetailedNormalizeFormatter
+     * @var DetailedNormalizerFormatter
      */
     public $formatter;
 
@@ -28,7 +28,7 @@ class DetailedNormalizeFormatterTest extends TestCase
     {
         parent::setUp();
 
-        $this->formatter = new DetailedNormalizeFormatter();
+        $this->formatter = new DetailedNormalizerFormatter();
     }
 
     public function testIncludesPublicProperties()

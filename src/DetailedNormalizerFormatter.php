@@ -24,7 +24,7 @@ use Monolog\Formatter\NormalizerFormatter;
  * Class DetailedNormalizeFormatter
  * @package HelmutSchneider\Monolog
  */
-class DetailedNormalizeFormatter extends NormalizerFormatter
+class DetailedNormalizerFormatter extends NormalizerFormatter
 {
 
     /**
@@ -38,20 +38,24 @@ class DetailedNormalizeFormatter extends NormalizerFormatter
             throw new \InvalidArgumentException('Exception/Throwable expected, got '.gettype($e).' / '.get_class($e));
         }
 
-        $data = array(
+        $data = [
             'class' => get_class($e),
             'message' => $e->getMessage(),
             'code' => $e->getCode(),
             'file' => $e->getFile().':'.$e->getLine(),
             'trace' => $this->normalize($e->getTrace()),
-        );
+        ];
 
         $reflection = new ReflectionClass($e);
 
         foreach ($reflection->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
-            $data[$property->getName()] = $this->normalize(
-                $property->getValue($e)
-            );
+            $name = $property->getName();
+
+            if (!isset($data[$name])) {
+                $data[$name] = $this->normalize(
+                    $property->getValue($e)
+                );
+            }
         }
 
         if ($previous = $e->getPrevious()) {

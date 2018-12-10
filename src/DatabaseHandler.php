@@ -9,6 +9,7 @@ declare(strict_types = 1);
 
 namespace HelmutSchneider\Monolog;
 
+use Monolog\Formatter\NormalizerFormatter;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
 
@@ -56,6 +57,8 @@ SQL;
         $this->tableName = $tableName;
 
         parent::__construct($level, $bubble);
+
+        $this->setFormatter(new NormalizerFormatter());
     }
 
     /**
@@ -86,14 +89,6 @@ SQL;
         ]);
 
         $this->isHandling = false;
-    }
-
-    /**
-     * @return \Monolog\Formatter\FormatterInterface
-     */
-    public function getFormatter()
-    {
-        return new DetailedNormalizeFormatter();
     }
 
 }

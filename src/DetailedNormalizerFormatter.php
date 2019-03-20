@@ -38,12 +38,13 @@ class DetailedNormalizerFormatter extends NormalizerFormatter
             throw new \InvalidArgumentException('Exception/Throwable expected, got '.gettype($e).' / '.get_class($e));
         }
 
+        $seen = [];
         $data = [
             'class' => get_class($e),
             'message' => $e->getMessage(),
             'code' => $e->getCode(),
             'file' => $e->getFile().':'.$e->getLine(),
-            'trace' => $this->normalizeTrace($e->getTrace()),
+            'trace' => $this->normalizeAndRemoveDuplicates($e->getTrace(), $seen),
         ];
 
         $reflection = new ReflectionClass($e);
@@ -70,24 +71,6 @@ class DetailedNormalizerFormatter extends NormalizerFormatter
      * To prevent memory exhaustion during serialization this function is used
      * to remove duplicates from the trace.
      *
-     * @param array $trace
-     * @return array
-     */
-    protected function normalizeTrace(array $trace): array
-    {
-        $out = $trace;
-        $seen = [];
-
-        foreach ($out as $traceIndex => $value) {
-            $out[$traceIndex]['args'] = $this->normalizeAndRemoveDuplicates(
-                $out[$traceIndex]['args'], $seen
-            );
-        }
-
-        return $out;
-    }
-
-    /**
      * @param mixed $data
      * @param array $seenObjects
      * @return mixed

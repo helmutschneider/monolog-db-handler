@@ -43,7 +43,7 @@ class DetailedNormalizerFormatter extends NormalizerFormatter
             'message' => $e->getMessage(),
             'code' => $e->getCode(),
             'file' => $e->getFile().':'.$e->getLine(),
-            'trace' => $this->normalize($e->getTrace()),
+            'trace' => $this->normalizeTrace($e->getTrace()),
         ];
 
         $reflection = new ReflectionClass($e);
@@ -65,4 +65,48 @@ class DetailedNormalizerFormatter extends NormalizerFormatter
         return $data;
     }
 
+    /**
+     * Stack traces generally contain lots of references to the same object.
+     * To prevent memory exhaustion during serialization this function is used
+     * to remove duplicates from the trace.
+     *
+     * @param array $trace
+     * @return array
+     */
+    protected function normalizeTrace(array $trace): array
+    {
+        $out = $trace;
+        $seen = [];
+
+        foreach ($out as $traceIndex => $value) {
+            $out[$traceIndex]['args'] = $this->normalizeAndRemoveDuplicates(
+                $out[$traceIndex]['args'], $seen
+            );
+        }
+
+        return $out;
+    }
+
+    /**
+     * @param mixed $data
+     * @param array $seenObjects
+     * @return mixed
+     */
+    protected function normalizeAndRemoveDuplicates($data, array &$seenObjects)
+    {
+        $out = $data;
+        if (is_array($out)) {
+            foreach ($out as $key => $value) {
+                $out[$key] = $this->normalizeAndRemoveDuplicates($value, $seenObjects);
+            }
+        } else if (is_object($out)) {
+            if (in_array($out, $seenObjects)) {
+                return sprintf("[object] (%s: %s)", get_class($out), spl_object_hash($out));
+            }
+
+            $seenObjects[] = $data;
+        }
+
+        return $this->normalize($out);
+    }
 }

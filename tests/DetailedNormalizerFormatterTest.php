@@ -66,13 +66,20 @@ class DetailedNormalizerFormatterTest extends TestCase
         $a = function ($arg) {
             return new \Exception('YEE');
         };
-        $e = $a((object) ['yee' => 'boi']);
+        $b = function ($arg) use ($a) {
+            return $a($arg);
+        };
+        $c = function ($arg) use ($b) {
+            return $b($arg);
+        };
+        $e = $c((object) ['yee' => 'boi']);
 
         $data = $this->formatter->format([
             'exception' => $e,
         ]);
 
-        $this->assertStringStartsWith('[object]', $data['exception']['trace'][0]['args'][0]);
+        $this->assertEquals('[object] (stdClass: {"yee":"boi"})', $data['exception']['trace'][0]['args'][0]);
+        $this->assertRegExp('/\[object\] \(stdClass: [a-f0-9]+\)/', $data['exception']['trace'][1]['args'][0]);
     }
 
 }

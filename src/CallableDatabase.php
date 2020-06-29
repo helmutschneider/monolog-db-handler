@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: johan
- * Date: 2018-10-10
- * Time: 00:31
- */
 declare(strict_types = 1);
 
 namespace HelmutSchneider\Monolog;
@@ -15,7 +9,6 @@ namespace HelmutSchneider\Monolog;
  */
 class CallableDatabase implements DatabaseInterface
 {
-
     /**
      * @var callable
      */

@@ -1,14 +1,7 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: johan
- * Date: 2018-12-06
- * Time: 18:29
- */
 declare(strict_types = 1);
 
 namespace HelmutSchneider\Monolog;
-
 
 use Exception;
 use ReflectionClass;
@@ -26,7 +19,6 @@ use Monolog\Formatter\NormalizerFormatter;
  */
 class DetailedNormalizerFormatter extends NormalizerFormatter
 {
-
     /**
      * @param Throwable|Exception $e
      * @return array

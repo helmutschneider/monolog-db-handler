@@ -14,7 +14,7 @@ class DatabaseHandlerTest extends TestCase
     /**
      * @var PDO[]
      */
-    public static $dbs = [];
+    public static array $dbs = [];
 
     public function setUp(): void
     {
@@ -43,9 +43,7 @@ class DatabaseHandlerTest extends TestCase
             }, $configs);
         }
 
-        return array_map(function (PDO $db) {
-            return [$db];
-        }, static::$dbs);
+        return array_map(fn (PDO $db) => [$db], static::$dbs);
     }
 
     /**
@@ -94,5 +92,4 @@ class DatabaseHandlerTest extends TestCase
         $this->assertCount(1, $rows);
         $this->assertStringContainsString('"handle":', $rows[0]['context']);
     }
-
 }

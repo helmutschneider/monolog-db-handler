@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: johan
- * Date: 2018-12-06
- * Time: 18:35
- */
 declare(strict_types = 1);
 
 namespace HelmutSchneider\Tests\Monolog;
@@ -18,11 +12,7 @@ use PHPUnit\Framework\TestCase;
  */
 class DetailedNormalizerFormatterTest extends TestCase
 {
-
-    /**
-     * @var DetailedNormalizerFormatter
-     */
-    public $formatter;
+    public DetailedNormalizerFormatter $formatter;
 
     public function setUp(): void
     {
@@ -34,7 +24,7 @@ class DetailedNormalizerFormatterTest extends TestCase
     public function testIncludesPublicProperties()
     {
         $e = new class extends \Exception {
-            public $yee = 'boi';
+            public string $yee = 'boi';
         };
 
         $data = $this->formatter->format([
@@ -81,5 +71,4 @@ class DetailedNormalizerFormatterTest extends TestCase
         $this->assertSame('[object] (stdClass: {"yee":"boi"})', $data['exception']['trace'][0]['args'][0]);
         $this->assertMatchesRegularExpression('/\[object\] \(stdClass: [a-f0-9]+\)/', $data['exception']['trace'][1]['args'][0]);
     }
-
 }

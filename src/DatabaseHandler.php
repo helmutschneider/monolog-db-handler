@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: johan
- * Date: 2018-09-09
- * Time: 15:46
- */
 declare(strict_types = 1);
 
 namespace HelmutSchneider\Monolog;
@@ -19,7 +13,6 @@ use Monolog\Logger;
  */
 class DatabaseHandler extends AbstractProcessingHandler
 {
-
     protected const INSERT_QUERY = <<<SQL
         INSERT INTO `%s`(`channel`, `level`, `datetime`, `message`, `context`, `extra`)
              VALUES (:channel, :level, :datetime, :message, :context, :extra)
@@ -32,17 +25,17 @@ SQL;
     /**
      * @var DatabaseInterface
      */
-    protected $db;
+    protected DatabaseInterface $db;
 
     /**
      * @var string
      */
-    protected $tableName;
+    protected string $tableName;
 
     /**
      * @var bool
      */
-    protected $isHandling = false;
+    protected bool $isHandling = false;
 
     /**
      * DatabaseHandler constructor.

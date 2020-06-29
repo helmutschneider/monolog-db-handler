@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: johan
- * Date: 2018-10-10
- * Time: 00:12
- */
 declare(strict_types = 1);
 
 namespace HelmutSchneider\Monolog;
@@ -13,11 +7,10 @@ use PDO;
 
 class PDODatabase implements DatabaseInterface
 {
-
     /**
      * @var PDO
      */
-    protected $pdo;
+    protected PDO $pdo;
 
     /**
      * PDODatabase constructor.

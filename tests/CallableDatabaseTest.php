@@ -16,5 +16,7 @@ class CallableDatabaseTest extends TestCase
         });
 
         $handler->execute('', []);
+
+        $this->assertSame(true, true);
     }
 }

@@ -67,10 +67,10 @@ class DatabaseHandlerTest extends TestCase
         $rows = $stmt->fetchAll();
 
         $this->assertCount(1, $rows);
-        $this->assertEquals('test', $rows[0]['channel']);
-        $this->assertEquals(Logger::DEBUG, $rows[0]['level']);
-        $this->assertEquals('Hello World', $rows[0]['message']);
-        $this->assertEquals('{"some_var":1}', $rows[0]['context']);
+        $this->assertSame('test', $rows[0]['channel']);
+        $this->assertSame((string) Logger::DEBUG, $rows[0]['level']);
+        $this->assertSame('Hello World', $rows[0]['message']);
+        $this->assertSame('{"some_var":1}', $rows[0]['context']);
     }
 
     /**

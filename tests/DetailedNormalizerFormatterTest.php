@@ -41,7 +41,7 @@ class DetailedNormalizerFormatterTest extends TestCase
             'exception' => $e,
         ]);
 
-        $this->assertEquals('boi', $data['exception']['yee']);
+        $this->assertSame('boi', $data['exception']['yee']);
     }
 
     public function testIncludesTraceArguments()
@@ -56,9 +56,9 @@ class DetailedNormalizerFormatterTest extends TestCase
             'exception' => $e,
         ]);
 
-        $this->assertEquals($message, $data['exception']['trace'][0]['args'][0]);
-        $this->assertEquals(__CLASS__, $data['exception']['trace'][1]['class']);
-        $this->assertEquals(__FUNCTION__, $data['exception']['trace'][1]['function']);
+        $this->assertSame($message, $data['exception']['trace'][0]['args'][0]);
+        $this->assertSame(__CLASS__, $data['exception']['trace'][1]['class']);
+        $this->assertSame(__FUNCTION__, $data['exception']['trace'][1]['function']);
     }
 
     public function testWorksWithObjectAsArgument()
@@ -78,7 +78,7 @@ class DetailedNormalizerFormatterTest extends TestCase
             'exception' => $e,
         ]);
 
-        $this->assertEquals('[object] (stdClass: {"yee":"boi"})', $data['exception']['trace'][0]['args'][0]);
+        $this->assertSame('[object] (stdClass: {"yee":"boi"})', $data['exception']['trace'][0]['args'][0]);
         $this->assertMatchesRegularExpression('/\[object\] \(stdClass: [a-f0-9]+\)/', $data['exception']['trace'][1]['args'][0]);
     }
 

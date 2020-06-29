@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: johan
- * Date: 2018-09-09
- * Time: 16:15
- */
 declare(strict_types = 1);
 
 namespace HelmutSchneider\Tests\Monolog;
@@ -17,13 +11,12 @@ use PHPUnit\Framework\TestCase;
 
 class DatabaseHandlerTest extends TestCase
 {
-
     /**
      * @var PDO[]
      */
     public static $dbs = [];
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -99,7 +92,7 @@ class DatabaseHandlerTest extends TestCase
         $rows = $stmt->fetchAll();
 
         $this->assertCount(1, $rows);
-        $this->assertContains('"handle":', $rows[0]['context']);
+        $this->assertStringContainsString('"handle":', $rows[0]['context']);
     }
 
 }

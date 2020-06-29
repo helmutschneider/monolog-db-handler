@@ -24,7 +24,7 @@ class DetailedNormalizerFormatterTest extends TestCase
      */
     public $formatter;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -79,7 +79,7 @@ class DetailedNormalizerFormatterTest extends TestCase
         ]);
 
         $this->assertEquals('[object] (stdClass: {"yee":"boi"})', $data['exception']['trace'][0]['args'][0]);
-        $this->assertRegExp('/\[object\] \(stdClass: [a-f0-9]+\)/', $data['exception']['trace'][1]['args'][0]);
+        $this->assertMatchesRegularExpression('/\[object\] \(stdClass: [a-f0-9]+\)/', $data['exception']['trace'][1]['args'][0]);
     }
 
 }

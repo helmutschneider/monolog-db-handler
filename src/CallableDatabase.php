@@ -22,6 +22,11 @@ class CallableDatabase implements DatabaseInterface
     protected $fn;
 
     /**
+     * @var boolean
+     */
+    protected bool $isInvokingDatabase = false;
+
+    /**
      * CallableDatabase constructor.
      * @param callable $fn
      */
@@ -37,7 +42,12 @@ class CallableDatabase implements DatabaseInterface
      */
     public function execute(string $query, array $parameters = [])
     {
-        return call_user_func($this->fn, $query, $parameters);
+        if ($this->isInvokingDatabase) {
+            return null;
+        }
+        $this->isInvokingDatabase = true;
+        $result = call_user_func($this->fn, $query, $parameters);
+        $this->isInvokingDatabase = false;
+        return $result;
     }
-
 }

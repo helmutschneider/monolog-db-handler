@@ -19,4 +19,21 @@ class CallableDatabaseTest extends TestCase
 
         $this->assertSame(true, true);
     }
+
+    public function testShouldNotBreakIfTheCallableThrows()
+    {
+        $handler = new CallableDatabase(function ($query, $parameters) {
+            if ($query === 'THROW_ME_PLEASE') {
+                throw new \RuntimeException('Yee');
+            }
+            return $query;
+        });
+
+        try {
+            $handler->execute('THROW_ME_PLEASE');
+        } catch (\Exception $e) {
+        }
+
+        $this->assertSame('OK', $handler->execute('OK'));
+    }
 }

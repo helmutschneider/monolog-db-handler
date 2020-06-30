@@ -39,8 +39,10 @@ class CallableDatabase implements DatabaseInterface
             return null;
         }
         $this->isInvokingDatabase = true;
-        $result = call_user_func($this->fn, $query, $parameters);
-        $this->isInvokingDatabase = false;
-        return $result;
+        try {
+            return call_user_func($this->fn, $query, $parameters);
+        } finally {
+            $this->isInvokingDatabase = false;
+        }
     }
 }

@@ -3,8 +3,10 @@ declare(strict_types = 1);
 
 namespace HelmutSchneider\Tests\Monolog;
 
+use Exception;
 use HelmutSchneider\Monolog\DetailedNormalizerFormatter;
 use PHPUnit\Framework\TestCase;
+use Throwable;
 
 /**
  * Class DetailedNormalizeFormatterTest
@@ -70,5 +72,24 @@ class DetailedNormalizerFormatterTest extends TestCase
 
         $this->assertSame('[object] (stdClass: {"yee":"boi"})', $data['exception']['trace'][0]['args'][0]);
         $this->assertMatchesRegularExpression('/\[object\] \(stdClass: [a-f0-9]+\)/', $data['exception']['trace'][1]['args'][0]);
+    }
+
+    public function testPreventsRecursionInExceptionProperties()
+    {
+        $e = new class extends Exception {
+            public $yee;
+            public function __construct($message = "", $code = 0, Throwable $previous = null)
+            {
+                parent::__construct($message, $code, $previous);
+
+                $this->yee = [$this];
+            }
+        };
+
+        $data = $this->formatter->format([
+            'exception' => $e,
+        ]);
+
+        $this->assertSame(true, true);
     }
 }

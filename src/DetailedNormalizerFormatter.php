@@ -20,6 +20,21 @@ use Monolog\Formatter\NormalizerFormatter;
 class DetailedNormalizerFormatter extends NormalizerFormatter
 {
     /**
+     * @var mixed[]
+     */
+    protected array $seenObjects = [];
+
+    /**
+     * @inheritDoc
+     */
+    public function format(array $record)
+    {
+        $this->seenObjects = [];
+
+        return parent::format($record);
+    }
+
+    /**
      * @param Throwable|Exception $e
      * @return array
      * @throws \ReflectionException
@@ -30,13 +45,16 @@ class DetailedNormalizerFormatter extends NormalizerFormatter
             throw new \InvalidArgumentException('Exception/Throwable expected, got '.gettype($e).' / '.get_class($e));
         }
 
-        $seen = [];
+        if (!in_array($e, $this->seenObjects)) {
+            $this->seenObjects[] = $e;
+        }
+
         $data = [
             'class' => get_class($e),
             'message' => $e->getMessage(),
             'code' => $e->getCode(),
             'file' => $e->getFile().':'.$e->getLine(),
-            'trace' => $this->normalizeAndRemoveDuplicates($e->getTrace(), $seen),
+            'trace' => $this->normalizeAndRemoveDuplicates($e->getTrace()),
         ];
 
         $reflection = new ReflectionClass($e);
@@ -45,7 +63,7 @@ class DetailedNormalizerFormatter extends NormalizerFormatter
             $name = $property->getName();
 
             if (!isset($data[$name])) {
-                $data[$name] = $this->normalize(
+                $data[$name] = $this->normalizeAndRemoveDuplicates(
                     $property->getValue($e)
                 );
             }
@@ -64,22 +82,21 @@ class DetailedNormalizerFormatter extends NormalizerFormatter
      * to remove duplicates from the trace.
      *
      * @param mixed $data
-     * @param array $seenObjects
      * @return mixed
      */
-    protected function normalizeAndRemoveDuplicates($data, array &$seenObjects)
+    protected function normalizeAndRemoveDuplicates($data)
     {
         $out = $data;
         if (is_array($out)) {
             foreach ($out as $key => $value) {
-                $out[$key] = $this->normalizeAndRemoveDuplicates($value, $seenObjects);
+                $out[$key] = $this->normalizeAndRemoveDuplicates($value);
             }
         } else if (is_object($out)) {
-            if (in_array($out, $seenObjects)) {
+            if (in_array($out, $this->seenObjects)) {
                 return sprintf("[object] (%s: %s)", get_class($out), spl_object_hash($out));
             }
 
-            $seenObjects[] = $data;
+            $this->seenObjects[] = $data;
         }
 
         return $this->normalize($out);
